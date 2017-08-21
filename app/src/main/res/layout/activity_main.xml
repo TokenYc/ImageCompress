@@ -1,88 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="net.archeryc.imagecompress.MainActivity">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="set quality compress"
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="16dp"
-        />
-
-    <com.xw.repo.BubbleSeekBar
-        android:id="@+id/seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:bsb_bubble_text_color="@color/colorPrimaryDark"
-        app:bsb_max="0"
-        app:bsb_min="100"
-        app:bsb_progress="90"
-        app:bsb_section_count="5"
-        app:bsb_section_text_position="bottom_sides"
-        app:bsb_show_section_mark="true"
-        app:bsb_show_section_text="true"
-        app:bsb_show_thumb_text="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-       />
-
-    <Button
-        android:id="@+id/btn_choose_img"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="选择图片"
-        android:layout_margin="10dp"
-        android:background="#a10c2d70"
-        android:textColor="#ffffff"
-        />
-
-    <Button
-        android:id="@+id/btn_compress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="压缩图片"
-        android:layout_margin="10dp"
-        android:background="#9abdc7"
-        />
-
-    <TextView
-        android:id="@+id/tv_des"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp"
-        >
-        <Button
-            android:id="@+id/btn_view_orgin"
-            android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="查看原图"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="5dp"
+            android:text="set quality compress" />
+
+        <com.xw.repo.BubbleSeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="8dp"
+            app:bsb_bubble_text_color="@color/colorPrimaryDark"
+            app:bsb_max="0"
+            app:bsb_min="100"
+            app:bsb_progress="90"
+            app:bsb_section_count="5"
+            app:bsb_section_text_position="bottom_sides"
+            app:bsb_show_section_mark="true"
+            app:bsb_show_section_text="true"
+            app:bsb_show_thumb_text="true" />
+
+        <Button
+            android:id="@+id/btn_choose_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:background="#a10c2d70"
-            android:layout_marginRight="5dp"
-            android:textColor="#ffffff"
-            />
+            android:text="选择图片"
+            android:textColor="#ffffff" />
+
         <Button
-            android:id="@+id/btn_view_compress"
-            android:layout_width="0dp"
+            android:id="@+id/btn_compress"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="查看压缩图"
+            android:layout_margin="10dp"
             android:background="#9abdc7"
-            android:layout_marginLeft="5dp"
-            />
+            android:text="压缩图片" />
+
+        <TextView
+            android:id="@+id/tv_des"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_view_orgin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:background="#a10c2d70"
+                android:text="查看原图"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/btn_view_compress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:background="#9abdc7"
+                android:text="查看压缩图" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+</ScrollView>
