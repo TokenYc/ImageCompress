@@ -1,5 +1,6 @@
 package net.archeryc.imagecompress;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.xw.repo.BubbleSeekBar;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
@@ -39,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvDes;
 
-    int options=ImageCompressUtils.DEFAULT_OPTIONS;
+    int options=ImageCompressUtils.Config.DEFAULT_OPTIONS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,14 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new PermissionListener() {
+                    @Override public void onPermissionGranted(PermissionGrantedResponse response) {/* ... */}
+                    @Override public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+                    @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                }).check();
 
         tvDes = (TextView) findViewById(R.id.tv_des);
         tvDes.setTextIsSelectable(true);
@@ -84,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String des = "spend time:" + (System.currentTimeMillis() - startTime) + "\n" +
                             "quality compress:" + options + "%" + "\n" +
-                            "max size:" + ImageCompressUtils.MAX_SIZE + "\n\n" +
+                            "max size:" + ImageCompressUtils.Config.MAX_SIZE + "\n\n" +
                             "input path:" + mSelectedPath + "\n" +
                             "input width:" + inputSize.getWidth() + "\n" +
                             "input height:" + inputSize.getHeight() + "\n" +

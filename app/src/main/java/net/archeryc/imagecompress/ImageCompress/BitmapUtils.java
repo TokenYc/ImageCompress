@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static net.archeryc.imagecompress.ImageCompress.ImageCompressUtils.Config.MAX_SIZE;
+
 /**
  * Created by yc on 2017/8/20.
  * Bitmap压缩工具类
@@ -31,7 +33,7 @@ public class BitmapUtils {
      */
     public static String compressImage(String inputFile, String outputFile, int targetWidth, int targetHeight, int options) {
         log("targetWidth===>" + targetWidth + "targetHeight=====>" + targetHeight + "mineType====>" + getImageMineType(inputFile));
-        Bitmap bitmap = getOriginBitmap(inputFile);
+        Bitmap bitmap = getOriginBitmap(inputFile,targetWidth,targetHeight);
         boolean success=compressImageToFile(executeMatrix(inputFile,bitmap,targetWidth,targetHeight), new File(outputFile), getImageMineType(inputFile),options);
         if (success){
             return outputFile;
@@ -45,10 +47,10 @@ public class BitmapUtils {
      * @param inputFile
      * @return
      */
-    private static Bitmap getOriginBitmap(String inputFile) {
+    private static Bitmap getOriginBitmap(String inputFile,int targetWidth,int targetHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         Size size = getImageSize(inputFile);
-        int sampleSize=size.getWidth()>size.getHeight()?size.getWidth()/ImageCompressUtils.MAX_SIZE:size.getHeight()/ImageCompressUtils.MAX_SIZE;
+        int sampleSize=size.getWidth()>size.getHeight()?size.getWidth()/targetWidth:size.getHeight()/targetHeight;
         if (sampleSize<=0){
             sampleSize=1;
         }
