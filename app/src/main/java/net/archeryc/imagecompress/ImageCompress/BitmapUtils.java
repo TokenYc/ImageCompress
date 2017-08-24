@@ -24,6 +24,7 @@ public class BitmapUtils {
 
     /**
      * 主要的压缩方法
+     *
      * @param inputFile
      * @param outputFile
      * @param targetWidth
@@ -31,56 +32,83 @@ public class BitmapUtils {
      * @param options
      * @return
      */
-    public static String compressImage(String inputFile, String outputFile, int targetWidth, int targetHeight, int options) {
+    public static String compressImage(String inputFile, String outputFile, float targetWidth, float targetHeight, int options) {
         log("targetWidth===>" + targetWidth + "targetHeight=====>" + targetHeight + "mineType====>" + getImageMineType(inputFile));
-        Bitmap bitmap = getOriginBitmap(inputFile,targetWidth,targetHeight);
-        boolean success=compressImageToFile(executeMatrix(inputFile,bitmap,targetWidth,targetHeight), new File(outputFile), getImageMineType(inputFile),options);
-        if (success){
+        Bitmap bitmap = getOriginBitmap(inputFile, targetWidth, targetHeight);
+        boolean success = compressImageToFile(executeMatrix(inputFile, bitmap, targetWidth, targetHeight), new File(outputFile), getImageMineType(inputFile), options);
+        if (success) {
             return outputFile;
-        }else{
+        } else {
             return inputFile;
         }
     }
 
     /**
      * 根据图片大小设置采样率，减少内存占用
+     *
      * @param inputFile
      * @return
      */
-    private static Bitmap getOriginBitmap(String inputFile,int targetWidth,int targetHeight) {
+    private static Bitmap getOriginBitmap(String inputFile, float targetWidth, float targetHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         Size size = getImageSize(inputFile);
-        int sampleSize=size.getWidth()>size.getHeight()?size.getWidth()/targetWidth:size.getHeight()/targetHeight;
-        if (sampleSize<=0){
-            sampleSize=1;
+        int singlePxSize;
+        switch (options.inPreferredConfig) {
+            case ARGB_4444:
+                singlePxSize = 2;
+                break;
+            case ARGB_8888:
+                singlePxSize = 4;
+                break;
+            case ALPHA_8:
+                singlePxSize = 1;
+                break;
+            case RGB_565:
+                singlePxSize = 2;
+                break;
+            case HARDWARE:
+            case RGBA_F16:
+                singlePxSize = 2;
+                break;
+            default:
+                singlePxSize = 2;
         }
-        options.inSampleSize = sampleSize;
+        float imageSize = size.getWidth() * size.getHeight() * singlePxSize / 1024 / 1024;
+
+        float allowSize = Runtime.getRuntime().maxMemory() / 1024 / 1024 / 2;
+
+        int sizeLimitSampleSize = (int) (Math.sqrt(imageSize / allowSize));
+
+        Log.d("yc", "imageSize====>" + imageSize + "allowSize===>" + allowSize);
+        int sampleSize = (int) (size.getWidth() > size.getHeight() ? size.getWidth() / targetWidth : size.getHeight() / targetHeight);
+        if (sampleSize <= 0) {
+            sampleSize = 1;
+        }
+        options.inSampleSize = sampleSize > sizeLimitSampleSize ? sampleSize : sizeLimitSampleSize;
         return BitmapFactory.decodeFile(inputFile, options);
     }
 
     /**
      * 对bitmap进行旋转和宽高变化
+     *
      * @param inputFile
      * @param bitmap
      * @param targetWidth
      * @param targetHeight
      * @return
      */
-    private static Bitmap executeMatrix(String inputFile,Bitmap bitmap,int targetWidth,int targetHeight){
-        log("bitmap width===>"+bitmap.getWidth()+"bitmap height===>"+bitmap.getHeight());
+    private static Bitmap executeMatrix(String inputFile, Bitmap bitmap, float targetWidth, float targetHeight) {
+        log("bitmap width===>" + bitmap.getWidth() + "bitmap height===>" + bitmap.getHeight());
         Matrix matrix = new Matrix();
-        if (bitmap.getWidth()>targetWidth&&bitmap.getHeight()>targetHeight) {
-            matrix.postScale((float)targetWidth/bitmap.getWidth(),(float) targetHeight/bitmap.getHeight());
-        }
+        ExifInterface exifReader = null;
+        int orientation = ExifInterface.ORIENTATION_NORMAL;
         try {
-            ExifInterface exifReader = null;
             exifReader = new ExifInterface(inputFile);
-            int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+            orientation=exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     matrix.postRotate(90);
                     break;
-
                 case ExifInterface.ORIENTATION_ROTATE_180:
                     matrix.postRotate(180);
                     break;
@@ -96,18 +124,31 @@ public class BitmapUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        int width;
+        int height;
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_90 || orientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            width = bitmap.getHeight();
+            height = bitmap.getWidth();
+        } else {
+            width = bitmap.getWidth();
+            height = bitmap.getHeight();
+        }
+        if (width > targetWidth && height > targetHeight) {
+            matrix.postScale(targetWidth / width, targetHeight / height);
+        }
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     /**
      * 压缩并保存到文件中
+     *
      * @param bmp
      * @param file
      * @param type
      * @param options
      * @return
      */
-    private static boolean compressImageToFile(Bitmap bmp, File file, int type,int options) {
+    private static boolean compressImageToFile(Bitmap bmp, File file, int type, int options) {
         // 0-100 100为不压缩
         boolean success = false;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -126,6 +167,8 @@ public class BitmapUtils {
         } catch (Exception e) {
             success = false;
             e.printStackTrace();
+        } finally {
+            bmp.recycle();
         }
         return success;
     }
@@ -133,6 +176,7 @@ public class BitmapUtils {
 
     /**
      * 获取图片宽高
+     *
      * @param inputFile
      * @return
      */
@@ -142,13 +186,41 @@ public class BitmapUtils {
         options.inJustDecodeBounds = true;
 
         BitmapFactory.decodeFile(inputFile, options);
+
         size.setWidth(options.outWidth);
         size.setHeight(options.outHeight);
+
+        try {
+            ExifInterface exifReader = null;
+            exifReader = new ExifInterface(inputFile);
+            int orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    size.setWidth(options.outHeight);
+                    size.setHeight(options.outWidth);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    size.setWidth(options.outHeight);
+                    size.setHeight(options.outWidth);
+                    break;
+                default: // ExifInterface.ORIENTATION_NORMAL
+                    // Do nothing. The original image is fine.
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         return size;
     }
 
     /**
      * 获取图片类型 gif,png,jpeg
+     *
      * @param path
      * @return
      */
