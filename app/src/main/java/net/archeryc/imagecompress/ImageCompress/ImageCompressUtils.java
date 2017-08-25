@@ -24,7 +24,13 @@ public class ImageCompressUtils {
 
     }
 
-    public static String compressImage(String inputFile, String outputFile, int options) {
+    public static String compressImage(String inputFile, String outputDir,int options) {
+
+        Utils.createNoMediaFile(outputDir);
+
+        if (inputFile.startsWith("file://")) {
+            inputFile = inputFile.replace("file://", "");
+        }
 
         //如果是Gif不进行压缩
         if (BitmapUtils.getImageMineType(inputFile) == BitmapUtils.ImageType.TYPE_GIF) {
@@ -88,7 +94,7 @@ public class ImageCompressUtils {
                 }
             }
         }
-        return BitmapUtils.compressImage(inputFile, outputFile, targetWidth, targetHeight, targetOptions);
+        return BitmapUtils.compressImage(inputFile, outputDir, targetWidth, targetHeight, targetOptions);
     }
 
 }

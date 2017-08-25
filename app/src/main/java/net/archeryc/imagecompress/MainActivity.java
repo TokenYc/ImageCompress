@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 
                     long startTime = System.currentTimeMillis();
-                    String outputPath = ImageCompressUtils.compressImage(mSelectedPath, mCompressedPath, options);
+                    String outputPath = ImageCompressUtils.compressImage(mSelectedPath, createDir(), options);
                     BitmapUtils.Size inputSize = BitmapUtils.getImageSize(mSelectedPath);
                     BitmapUtils.Size outputSize = BitmapUtils.getImageSize(outputPath);
 
@@ -156,12 +156,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String createDir() {
-        File file = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "aImageTest" + File.separator);
+        String path=Environment.getExternalStorageDirectory().getPath() + File.separator + "aImageTest" + File.separator;
+        File file = new File(path);
         if (file.exists()) {
-            return file.getPath();
+            return path;
         } else {
             file.mkdir();
-            return file.getPath();
+            return path;
         }
     }
 

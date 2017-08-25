@@ -26,15 +26,25 @@ public class BitmapUtils {
      * 主要的压缩方法
      *
      * @param inputFile
-     * @param outputFile
+     * @param outputDir
      * @param targetWidth
      * @param targetHeight
      * @param options
      * @return
      */
-    public static String compressImage(String inputFile, String outputFile, float targetWidth, float targetHeight, int options) {
+    public static String compressImage(String inputFile, String outputDir, float targetWidth, float targetHeight, int options) {
         log("targetWidth===>" + targetWidth + "targetHeight=====>" + targetHeight + "mineType====>" + getImageMineType(inputFile));
         Bitmap bitmap = getOriginBitmap(inputFile, targetWidth, targetHeight);
+        String outputFile;
+        File file = new File(outputDir);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        if (getImageMineType(inputFile) == ImageType.TYPE_PNG) {
+            outputFile = outputDir + System.currentTimeMillis() + ".png";
+        } else {
+            outputFile = outputDir + System.currentTimeMillis() + ".jpg";
+        }
         boolean success = compressImageToFile(executeMatrix(inputFile, bitmap, targetWidth, targetHeight), new File(outputFile), getImageMineType(inputFile), options);
         if (success) {
             return outputFile;
@@ -104,7 +114,7 @@ public class BitmapUtils {
         int orientation = ExifInterface.ORIENTATION_NORMAL;
         try {
             exifReader = new ExifInterface(inputFile);
-            orientation=exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            orientation = exifReader.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     matrix.postRotate(90);
